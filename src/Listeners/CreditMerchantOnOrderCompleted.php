@@ -32,17 +32,20 @@ class CreditMerchantOnOrderCompleted
                 return;
             }
 
-            $wallet = Wallet::query()
-                ->where('walletable_type', User::class)
-                ->where('walletable_id', $store->user_id)
-                ->first();
-            if (! $wallet) {
-                return;
-            }
-
             $amount = (float) $event->order->total;
             $fee = config('finance.platform_fee', 0);
             $netAmount = $amount - ($amount * $fee);
+
+            $wallet = Wallet::firstOrCreate(
+                [
+                    'walletable_type' => User::class,
+                    'walletable_id' => $store->user_id,
+                ],
+                [
+                    'balance' => 0,
+                    'currency' => config('finance.currency', 'IDR'),
+                ]
+            );
 
             $wallet->credit($netAmount, 'commission', "Pendapatan order {$event->order->order_number}");
         } catch (\Throwable $e) {
