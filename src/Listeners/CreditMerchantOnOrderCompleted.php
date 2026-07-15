@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Moe\Finance\Listeners;
 
+use App\Models\User;
 use Moe\Commerce\Events\OrderStatusChanged;
 use Moe\Finance\Models\Wallet;
 
@@ -29,7 +30,10 @@ class CreditMerchantOnOrderCompleted
             return;
         }
 
-        $wallet = Wallet::where('user_id', $store->user_id)->first();
+        $wallet = Wallet::query()
+            ->where('walletable_type', User::class)
+            ->where('walletable_id', $store->user_id)
+            ->first();
         if (! $wallet) {
             return;
         }
