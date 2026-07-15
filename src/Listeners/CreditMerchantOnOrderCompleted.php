@@ -9,6 +9,11 @@ use Moe\Finance\Models\Wallet;
 
 class CreditMerchantOnOrderCompleted
 {
+    /**
+     * Handle the event.
+     *
+     * @param \Moe\Commerce\Events\OrderStatusChanged $event
+     */
     public function handle(OrderStatusChanged $event): void
     {
         if ($event->newStatus !== 'completed') {

@@ -16,6 +16,8 @@ class WalletService extends BaseService implements WalletProviderInterface
 {
     /**
      * Get or create wallet for a model.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function getWallet(): ?Model
     {
@@ -36,6 +38,8 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Get current balance.
+     *
+     * @return float
      */
     public function getBalance(): float
     {
@@ -46,6 +50,13 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Credit amount to wallet.
+     *
+     * @param float $amount
+     * @param string $type
+     * @param string|null $description
+     * @return \Moe\Finance\Models\WalletTransaction
+     *
+     * @throws \RuntimeException
      */
     public function credit(float $amount, string $type, ?string $description = null): WalletTransaction
     {
@@ -62,6 +73,13 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Debit amount from wallet.
+     *
+     * @param float $amount
+     * @param string $type
+     * @param string|null $description
+     * @return \Moe\Finance\Models\WalletTransaction
+     *
+     * @throws \RuntimeException
      */
     public function debit(float $amount, string $type, ?string $description = null): WalletTransaction
     {
@@ -78,6 +96,9 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Check if wallet has sufficient balance.
+     *
+     * @param float $amount
+     * @return bool
      */
     public function hasSufficientBalance(float $amount): bool
     {
@@ -86,6 +107,13 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Transfer between wallets.
+     *
+     * @param \Moe\Finance\Models\Wallet $from
+     * @param \Moe\Finance\Models\Wallet $to
+     * @param float $amount
+     * @param string|null $description
+     *
+     * @throws \Moe\Core\Exceptions\InsufficientBalance
      */
     public function transfer(Wallet $from, Wallet $to, float $amount, ?string $description = null): void
     {
@@ -97,6 +125,9 @@ class WalletService extends BaseService implements WalletProviderInterface
 
     /**
      * Get transaction history.
+     *
+     * @param int $limit
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getTransactions(int $limit = 50): Collection
     {

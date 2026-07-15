@@ -11,11 +11,17 @@ use Moe\Finance\Listeners\CreditMerchantOnOrderCompleted;
 
 class FinanceServiceProvider extends ServiceProvider
 {
+    /**
+     * Register the service provider.
+     */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/finance.php', 'finance');
     }
 
+    /**
+     * Bootstrap any application services.
+     */
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -33,6 +39,9 @@ class FinanceServiceProvider extends ServiceProvider
         $this->registerEventListeners();
     }
 
+    /**
+     * Register event listeners.
+     */
     protected function registerEventListeners(): void
     {
         if (! class_exists(OrderStatusChanged::class)) {
