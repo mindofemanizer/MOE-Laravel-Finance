@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Moe\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WalletTransaction extends Model
@@ -40,7 +43,7 @@ class WalletTransaction extends Model
         return $this->belongsTo(Wallet::class);
     }
 
-    public function reference()
+    public function reference(): MorphTo
     {
         return $this->morphTo();
     }

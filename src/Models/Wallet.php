@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Moe\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Moe\Core\Traits\HasWallet;
+use Illuminate\Support\Facades\DB;
 
 class Wallet extends Model
 {
@@ -48,38 +50,42 @@ class Wallet extends Model
 
     public function credit(float $amount, string $type, ?string $description = null): WalletTransaction
     {
-        $balanceBefore = $this->getBalance();
+        return DB::transaction(function () use ($amount, $type, $description) {
+            $balanceBefore = $this->getBalance();
 
-        $this->increment('balance', $amount);
+            $this->increment('balance', $amount);
 
-        return $this->transactions()->create([
-            'type' => $type,
-            'amount' => $amount,
-            'description' => $description,
-            'balance_before' => $balanceBefore,
-            'balance_after' => $balanceBefore + $amount,
-        ]);
+            return $this->transactions()->create([
+                'type' => $type,
+                'amount' => $amount,
+                'description' => $description,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceBefore + $amount,
+            ]);
+        });
     }
 
     public function debit(float $amount, string $type, ?string $description = null): WalletTransaction
     {
-        if ($this->getBalance() < $amount) {
-            throw new \Moe\Core\Exceptions\InsufficientBalance(
-                "Saldo tidak mencukupi. Dibutuhkan: {$amount}, Tersedia: {$this->getBalance()}"
-            );
-        }
+        return DB::transaction(function () use ($amount, $type, $description) {
+            $balanceBefore = $this->getBalance();
 
-        $balanceBefore = $this->getBalance();
+            if ($balanceBefore < $amount) {
+                throw new \Moe\Core\Exceptions\InsufficientBalance(
+                    "Saldo tidak mencukupi. Dibutuhkan: {$amount}, Tersedia: {$balanceBefore}"
+                );
+            }
 
-        $this->decrement('balance', $amount);
+            $this->decrement('balance', $amount);
 
-        return $this->transactions()->create([
-            'type' => $type,
-            'amount' => -$amount,
-            'description' => $description,
-            'balance_before' => $balanceBefore,
-            'balance_after' => $balanceBefore - $amount,
-        ]);
+            return $this->transactions()->create([
+                'type' => $type,
+                'amount' => -$amount,
+                'description' => $description,
+                'balance_before' => $balanceBefore,
+                'balance_after' => $balanceBefore - $amount,
+            ]);
+        });
     }
 
     public function hasSufficientBalance(float $amount): bool

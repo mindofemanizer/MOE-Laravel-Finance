@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Moe\Finance\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Moe\Core\Base\BaseService;
-use Moe\Core\Exceptions\InsufficientBalance;
 use Moe\Finance\Contracts\WalletProviderInterface;
 use Moe\Finance\Models\Wallet;
 use Moe\Finance\Models\WalletTransaction;
@@ -96,7 +98,7 @@ class WalletService extends BaseService implements WalletProviderInterface
     /**
      * Get transaction history.
      */
-    public function getTransactions(int $limit = 50): \Illuminate\Database\Eloquent\Collection
+    public function getTransactions(int $limit = 50): Collection
     {
         $wallet = $this->getWallet();
 

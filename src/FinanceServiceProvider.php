@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Moe\Finance;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Moe\Commerce\Events\OrderStatusChanged;
+use Moe\Finance\Listeners\CreditMerchantOnOrderCompleted;
 
 class FinanceServiceProvider extends ServiceProvider
 {
@@ -31,13 +35,13 @@ class FinanceServiceProvider extends ServiceProvider
 
     protected function registerEventListeners(): void
     {
-        if (! class_exists('Moe\\Commerce\\Events\\OrderStatusChanged')) {
+        if (! class_exists(OrderStatusChanged::class)) {
             return;
         }
 
         Event::listen(
-            'Moe\\Commerce\\Events\\OrderStatusChanged',
-            'Moe\\Finance\\Listeners\\CreditMerchantOnOrderCompleted'
+            OrderStatusChanged::class,
+            CreditMerchantOnOrderCompleted::class
         );
     }
 }

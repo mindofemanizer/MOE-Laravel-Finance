@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Moe\Finance\Listeners;
 
 use Moe\Commerce\Events\OrderStatusChanged;
 use Moe\Finance\Models\Wallet;
-use Moe\Finance\Models\WalletTransaction;
 
 class CreditMerchantOnOrderCompleted
 {
     public function handle(OrderStatusChanged $event): void
     {
         if ($event->newStatus !== 'completed') {
+            return;
+        }
+
+        if (! $event->order) {
             return;
         }
 
@@ -28,13 +33,6 @@ class CreditMerchantOnOrderCompleted
         $fee = config('finance.platform_fee', 0);
         $netAmount = $amount - ($amount * $fee);
 
-        $wallet->transactions()->create([
-            'type' => 'credit',
-            'amount' => $netAmount,
-            'description' => "Pendapatan order {$event->order->order_number}",
-            'reference_type' => 'order',
-            'reference_id' => $event->order->id,
-            'status' => 'completed',
-        ]);
+        $wallet->credit($netAmount, 'commission', "Pendapatan order {$event->order->order_number}");
     }
 }
