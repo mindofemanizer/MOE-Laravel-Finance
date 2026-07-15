@@ -2,6 +2,7 @@
 
 namespace Moe\Finance;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class FinanceServiceProvider extends ServiceProvider
@@ -24,5 +25,19 @@ class FinanceServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'finance-migrations');
+
+        $this->registerEventListeners();
+    }
+
+    protected function registerEventListeners(): void
+    {
+        if (! class_exists('Moe\\Commerce\\Events\\OrderStatusChanged')) {
+            return;
+        }
+
+        Event::listen(
+            'Moe\\Commerce\\Events\\OrderStatusChanged',
+            'Moe\\Finance\\Listeners\\CreditMerchantOnOrderCompleted'
+        );
     }
 }
