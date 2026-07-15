@@ -97,16 +97,17 @@ class Wallet extends Model
      * @param float $amount
      * @param string $type
      * @param string|null $description
+     * @param bool $allowNegative kalau true, saldo boleh minus (mis. reversal komisi yg sudah dicairkan → piutang).
      * @return \Moe\Finance\Models\WalletTransaction
      *
      * @throws \Moe\Core\Exceptions\InsufficientBalance
      */
-    public function debit(float $amount, string $type, ?string $description = null): WalletTransaction
+    public function debit(float $amount, string $type, ?string $description = null, bool $allowNegative = false): WalletTransaction
     {
-        return DB::transaction(function () use ($amount, $type, $description) {
+        return DB::transaction(function () use ($amount, $type, $description, $allowNegative) {
             $balanceBefore = $this->getBalance();
 
-            if ($balanceBefore < $amount) {
+            if ($balanceBefore < $amount && ! $allowNegative) {
                 throw new \Moe\Core\Exceptions\InsufficientBalance(
                     "Saldo tidak mencukupi. Dibutuhkan: {$amount}, Tersedia: {$balanceBefore}"
                 );
