@@ -1,15 +1,8 @@
 {
     "name": "moe/laravel-finance",
-    "description": "Finance module for MOE ecosystem — Wallet, Payment, Refund",
+    "description": "Finance module for MOE ecosystem — Wallet, WalletTransaction",
     "type": "library",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "MindOfEmanizer",
-            "email": "emanizer@example.com"
-        }
-    ],
-    "keywords": ["laravel", "finance", "wallet", "payment", "refund", "moe"],
     "autoload": {
         "psr-4": {
             "Moe\\Finance\\": "src/"
@@ -22,13 +15,19 @@
     },
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0",
         "moe/laravel-core": "*"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0",
-        "phpunit/phpunit": "^11.0"
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^10.5"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "D:\\Project-Development\\MOE-Laravel-Core"
+        }
+    ],
     "extra": {
         "laravel": {
             "providers": [
