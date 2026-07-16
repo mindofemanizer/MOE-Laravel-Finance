@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Moe\Finance\Listeners;
 
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Moe\Commerce\Events\OrderStatusChanged;
@@ -33,8 +34,15 @@ class CreditMerchantOnOrderCompleted
             }
 
             $amount = (float) $event->order->total;
-            $fee = config('finance.platform_fee', 0);
-            $netAmount = $amount - ($amount * $fee);
+
+            // Fee rate per-store (override global platform_fee).
+            // Store::getEffectiveFeeRate() fallback ke setting marketplace.default_fee_rate.
+            $feeRate = $store instanceof Store
+                ? $store->getEffectiveFeeRate()
+                : (float) config('finance.platform_fee', 0);
+
+            $fee = $amount * $feeRate;
+            $netAmount = $amount - $fee;
 
             $wallet = Wallet::firstOrCreate(
                 [
